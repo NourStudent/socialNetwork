@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="gWW-4D-unm">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="vKi-GR-bUM">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
@@ -8,35 +8,108 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--ConversationsViewController-->
-        <scene sceneID="tne-QT-ifu">
+        <!--Navigation Controller-->
+        <scene sceneID="OoN-6G-tb2">
             <objects>
-                <viewController id="BYZ-38-t0r" userLabel="ConversationsViewController" customClass="ConversationsViewController" customModule="socialNetwork" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                    </view>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
+                <navigationController id="qPP-Jn-fvi" sceneMemberID="viewController">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="d0Z-hU-bbH">
+                        <rect key="frame" x="0.0" y="44" width="414" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="vpa-hY-krw" kind="relationship" relationship="rootViewController" id="8CW-tW-cpg"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Ocx-6J-FJO" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-29" y="65"/>
+            <point key="canvasLocation" x="-1101" y="433"/>
         </scene>
-        <!--RegisterViewController-->
-        <scene sceneID="b2W-dh-z3f">
+        <!--Conversations-->
+        <scene sceneID="xKg-u8-TmG">
             <objects>
-                <viewController title="Register" id="gWW-4D-unm" userLabel="RegisterViewController" customClass="RegisterViewController" customModule="socialNetwork" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="fbn-Gq-MLt">
+                <viewController id="vpa-hY-krw" customClass="ConversationsViewController" customModule="socialNetwork" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="RUI-xa-acw">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <viewLayoutGuide key="safeArea" id="g8x-U7-xUA"/>
+                        <viewLayoutGuide key="safeArea" id="IsK-wg-xOT"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     </view>
+                    <navigationItem key="navigationItem" title="Conversations" id="9bB-LV-BDM">
+                        <barButtonItem key="backBarButtonItem" title="Conversations" id="nzI-tn-m0R"/>
+                    </navigationItem>
+                    <connections>
+                        <segue destination="vKi-GR-bUM" kind="show" id="K5x-D6-jC4"/>
+                    </connections>
                 </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="hBb-9g-JLQ" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="rxi-KD-k7G" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="619" y="91"/>
+            <point key="canvasLocation" x="293" y="433"/>
+        </scene>
+        <!--Register-->
+        <scene sceneID="7Wf-r8-iVF">
+            <objects>
+                <viewController id="GvP-qK-MIA" customClass="RegisterViewController" customModule="socialNetwork" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="y40-ca-Ce6">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <viewLayoutGuide key="safeArea" id="h78-ca-jZI"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    </view>
+                    <navigationItem key="navigationItem" title="Register" id="TAr-CG-uYD">
+                        <barButtonItem key="backBarButtonItem" title="Login" id="RgZ-P9-Vdc"/>
+                    </navigationItem>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="bEL-3P-Ctr" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2155" y="433"/>
+        </scene>
+        <!--Login View Controller-->
+        <scene sceneID="at0-cE-6b3">
+            <objects>
+                <viewController id="vKi-GR-bUM" customClass="LoginViewController" customModule="socialNetwork" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="dvI-mg-O7Y">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="e9F-VA-aSn">
+                                <rect key="frame" x="232" y="50" width="182" height="51"/>
+                                <state key="normal" title="Register"/>
+                                <connections>
+                                    <segue destination="GvP-qK-MIA" kind="show" id="xbH-LP-bzH"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="HY5-PL-y7I"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="e9F-VA-aSn" firstAttribute="leading" secondItem="HY5-PL-y7I" secondAttribute="leading" constant="232" id="VDc-fq-Y47"/>
+                            <constraint firstItem="e9F-VA-aSn" firstAttribute="trailing" secondItem="HY5-PL-y7I" secondAttribute="trailing" id="mTe-qI-AIi"/>
+                            <constraint firstItem="HY5-PL-y7I" firstAttribute="bottom" secondItem="e9F-VA-aSn" secondAttribute="bottom" constant="712" id="rqJ-Pr-H6O"/>
+                            <constraint firstItem="e9F-VA-aSn" firstAttribute="top" secondItem="dvI-mg-O7Y" secondAttribute="topMargin" constant="-38" id="rqd-fk-7df"/>
+                        </constraints>
+                        <variation key="default">
+                            <mask key="constraints">
+                                <exclude reference="rqJ-Pr-H6O"/>
+                                <exclude reference="VDc-fq-Y47"/>
+                                <exclude reference="mTe-qI-AIi"/>
+                                <exclude reference="rqd-fk-7df"/>
+                            </mask>
+                        </variation>
+                        <variation key="widthClass=compact">
+                            <mask key="constraints">
+                                <include reference="rqJ-Pr-H6O"/>
+                                <include reference="VDc-fq-Y47"/>
+                                <include reference="mTe-qI-AIi"/>
+                                <include reference="rqd-fk-7df"/>
+                            </mask>
+                        </variation>
+                    </view>
+                    <toolbarItems/>
+                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="lsz-aQ-iZo" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1102.8985507246377" y="432.58928571428572"/>
         </scene>
     </scenes>
     <resources>

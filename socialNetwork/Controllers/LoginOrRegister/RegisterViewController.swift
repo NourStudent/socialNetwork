@@ -11,21 +11,53 @@ import FirebaseStorage
 
 class RegisterViewController: UIViewController ,UIImagePickerControllerDelegate , UINavigationControllerDelegate{
 
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setupInputFiels()
+    }
+    
+    //MARK: -Handeling the profile photo
     let plusPhotoBouton :UIButton =
         {
             let bouton = UIButton(type: .system)// ce type de bouton preprogramme dans le systeme permet une effet floute lorsqu'on clique sur dessus
           
             bouton.setImage(#imageLiteral(resourceName: "plus_photo").withRenderingMode(.alwaysOriginal), for: .normal)//(withRenderingMode(.alwaysOriginal)) pour garder toujours la couleur originale de la photo
             
-            bouton.addTarget(self, action: #selector(handlePlusPhoto), for: .touchUpInside)
+            bouton.addTarget(self, action: #selector(presentPhotoActionSheet), for: .touchUpInside)
             return bouton
     }()
     
-    @objc func handlePlusPhoto(){
+     func handlePlusPhoto(){
        let imagePickerController = UIImagePickerController()
         imagePickerController.delegate = self
         imagePickerController.allowsEditing = true
        present(imagePickerController, animated: true, completion: nil)
+    }
+    
+    func presentCamera(){
+        let vc = UIImagePickerController()
+        vc.sourceType = .camera
+        vc.delegate = self
+        vc.allowsEditing = true
+        present(vc, animated: true)
+    }
+    
+    @objc func presentPhotoActionSheet(){
+        let actionSheet = UIAlertController(title: "Profile Picture", message: "How would you like to select a picture?", preferredStyle: .actionSheet)
+        actionSheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        actionSheet.addAction(UIAlertAction(
+                                title: "Take Photo",
+                                style: .default,
+                                handler: {[weak self]_ in
+                                    
+                                    self?.presentCamera()
+                                }))
+        actionSheet.addAction(UIAlertAction(title: "Choose Photo", style: .default, handler: { [weak self]_ in
+            
+                                    self?.handlePlusPhoto()
+        }))
+        
+        present(actionSheet, animated: true)
     }
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
@@ -41,13 +73,16 @@ class RegisterViewController: UIViewController ,UIImagePickerControllerDelegate 
         dismiss(animated: true, completion: nil)
     }
     
+    
+    //MARK: Handeling the textFields
+    
     let emailTextField:UITextField = {
         let tf = UITextField()
         tf.placeholder = "Email Adress"
         tf.backgroundColor = UIColor(white: 0, alpha: 0.03)
         tf.borderStyle = .roundedRect
         tf.font = .systemFont(ofSize: 14)
-        
+        tf.returnKeyType = .continue
         tf.addTarget(self, action: #selector(handleTextInputChange), for: .editingChanged)
         
         return tf
@@ -60,7 +95,7 @@ class RegisterViewController: UIViewController ,UIImagePickerControllerDelegate 
         tf.backgroundColor = UIColor(white: 0, alpha: 0.03)
         tf.borderStyle = .roundedRect
         tf.font = .systemFont(ofSize: 14)
-        
+        tf.returnKeyType = .continue
         tf.addTarget(self, action: #selector(handleTextInputChange), for: .editingChanged)
         
         return tf
@@ -74,7 +109,7 @@ class RegisterViewController: UIViewController ,UIImagePickerControllerDelegate 
         tf.backgroundColor = UIColor(white: 0, alpha: 0.03)
         tf.borderStyle = .roundedRect
         tf.font = .systemFont(ofSize: 14)
-        
+        tf.returnKeyType = .done
         tf.addTarget(self, action: #selector(handleTextInputChange), for: .editingChanged)
         
         return tf
@@ -93,11 +128,13 @@ class RegisterViewController: UIViewController ,UIImagePickerControllerDelegate 
     }
     
     
+    //MARK: -Handling sign Up
+    
     let signUpButton: UIButton = {
         let bouton = UIButton(type: .system)
       
         bouton.backgroundColor = UIColor.rgb(red: 149, green: 204, blue: 244)
-        bouton.titleLabel?.font = .boldSystemFont(ofSize: 14)
+        bouton.titleLabel?.font = .boldSystemFont(ofSize: 20)
         bouton.setTitle("Register", for: .normal)
         bouton.setTitleColor(.white, for: .normal)
         bouton.layer.cornerRadius = 5
@@ -119,7 +156,12 @@ class RegisterViewController: UIViewController ,UIImagePickerControllerDelegate 
             return
         }
 
-        Auth.auth().createUser(withEmail: email, password: password) { (user, error:Error?) in
+        Auth.auth().createUser(withEmail: email, password: password) { [weak self] (user, error:Error?)in
+            
+            guard let strongSelf = self else{
+                return
+            }
+            
             if let err = error{
                 print("Echec pour la creation d'un nouveau utilisateur:" , err)
             }
@@ -129,13 +171,15 @@ class RegisterViewController: UIViewController ,UIImagePickerControllerDelegate 
             
             let storageRef = Storage.storage().reference().child("profile_Images").child(filename)
             
-            guard let image = self.plusPhotoBouton.imageView?.image else {return}
+            guard let image = strongSelf.plusPhotoBouton.imageView?.image else {return}
+            
             guard let uploadData = image.jpegData(compressionQuality: 0.3) else {return}
             storageRef.putData(uploadData, metadata: nil) { (metadata, err) in
                 if let err = err {
                     print("uploading profile image failed" , err)
                     return
                 }
+                
                 
                 storageRef.downloadURL { (downloadURL, err) in
                     guard let profileImageUrl = downloadURL?.absoluteString else {return}
@@ -150,6 +194,8 @@ class RegisterViewController: UIViewController ,UIImagePickerControllerDelegate 
                             return
                         }
                             print("backup user informations succeed ")
+                        
+                        strongSelf.navigationController?.dismiss(animated: true, completion: nil)
                         }
                 }
             }
@@ -159,11 +205,7 @@ class RegisterViewController: UIViewController ,UIImagePickerControllerDelegate 
         }
     }
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-       
-        setupInputFiels()
-    }
+   //MARK: -Contraintes
     
     fileprivate func  setupInputFiels(){
         
@@ -171,7 +213,7 @@ class RegisterViewController: UIViewController ,UIImagePickerControllerDelegate 
      
         plusPhotoBouton.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
         
-        plusPhotoBouton.anchors(top: view.safeAreaLayoutGuide.topAnchor, left: nil, bottom: nil, right: nil, topConstant: 20, leftConstant: 0, bottomConstant: 0, rightConstant: 0, width: 140, height: 140)
+        plusPhotoBouton.anchors(top: view.safeAreaLayoutGuide.topAnchor, left: nil, bottom: nil, right: nil, topConstant: 150, leftConstant: 0, bottomConstant: 0, rightConstant: 0, width: 140, height: 140)
       
         let stackView = UIStackView(arrangedSubviews: [emailTextField, usernameTextField, passwordTextField,signUpButton])
         stackView.translatesAutoresizingMaskIntoConstraints = false
