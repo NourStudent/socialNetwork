@@ -12,9 +12,10 @@ class LoginViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.title = "Log In"
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Register", style: .done, target: self, action: #selector(didTapRegister))
         setupInputFiels()
       }
-    
     
     
     //MARK: Views
@@ -25,9 +26,6 @@ class LoginViewController: UIViewController {
         imageView.layer.masksToBounds = true
         return imageView
     }()
-    
-  
-
     
     let emailTextField:UITextField = {
         let tf = UITextField()
@@ -66,6 +64,8 @@ class LoginViewController: UIViewController {
         }
     }
     
+    //MARK: Handeling the sign in
+    
     let signUpButton: UIButton = {
         let bouton = UIButton(type: .system)
       
@@ -97,6 +97,7 @@ class LoginViewController: UIViewController {
             }
             guard let result = authResult , error == nil else{
                 print("Failed to log in user with email: \(email)")
+                self?.presentAlert(with: "Invalid informations! try again")
                 return
             }
             
@@ -106,6 +107,16 @@ class LoginViewController: UIViewController {
         }
 }
     
+    
+    //MARK: - Navigate to Register Page
+    
+    
+    @objc private func didTapRegister(){
+        let vc = RegisterViewController()
+        vc.title = "Create Account"
+        navigationController?.pushViewController(vc, animated: false)
+        
+    }
    
     //MARK: -CONTRAINTES
     fileprivate func  setupInputFiels(){
@@ -135,6 +146,12 @@ class LoginViewController: UIViewController {
      
         stackView.anchors( top: imageView.bottomAnchor, left: view.leftAnchor, bottom: nil, right: view.rightAnchor, topConstant: 20, leftConstant: 40, bottomConstant: 0, rightConstant: 40 ,width: 0, height: 200)  //les contraintes de la stackView
       
+    }
+    private func presentAlert(with error: String) {
+        let alert = UIAlertController(title: "Erreur", message: error, preferredStyle: .alert)
+        let action = UIAlertAction(title: "OK", style: .cancel, handler: nil)
+        alert.addAction(action)
+        present(alert, animated: true, completion: nil)
     }
 }
 

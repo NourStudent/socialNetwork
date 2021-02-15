@@ -13,6 +13,7 @@ class RegisterViewController: UIViewController ,UIImagePickerControllerDelegate 
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.title = "Register"
         setupInputFiels()
     }
     
@@ -144,6 +145,14 @@ class RegisterViewController: UIViewController ,UIImagePickerControllerDelegate 
         return bouton
     }()
     
+    
+    private func presentAlert(with error: String) {
+        let alert = UIAlertController(title: "Erreur", message: error, preferredStyle: .alert)
+        let action = UIAlertAction(title: "OK", style: .cancel, handler: nil)
+        alert.addAction(action)
+        present(alert, animated: true, completion: nil)
+    }
+    
     @objc func handleSighUp(){
       
         guard let email = emailTextField.text, email.count > 0 else {
@@ -155,18 +164,21 @@ class RegisterViewController: UIViewController ,UIImagePickerControllerDelegate 
         guard let password = passwordTextField.text, password.count > 0 else {
             return
         }
-
-        Auth.auth().createUser(withEmail: email, password: password) { [weak self] (user, error:Error?)in
+        
+       
+    Auth.auth().createUser(withEmail: email, password: password) { [weak self] (user, error:Error?)in
             
             guard let strongSelf = self else{
                 return
             }
             
             if let err = error{
-                print("Echec pour la creation d'un nouveau utilisateur:" , err)
+                print("error , user has not been created" , err)
+                
+                self?.presentAlert(with: "email address is already in use by another account")
             }
             
-            print("l'utilisteur a ete cree correctement" , user?.user.uid ?? "")
+            print("user created correctly" , user?.user.uid ?? "")
             let filename = NSUUID().uuidString
             
             let storageRef = Storage.storage().reference().child("profile_Images").child(filename)
