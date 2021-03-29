@@ -191,6 +191,7 @@
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="DEa-CP-K1s"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <gestureRecognizers/>
                         <constraints>
                             <constraint firstItem="k4q-I0-j9w" firstAttribute="leading" secondItem="dcg-MX-IsS" secondAttribute="trailing" constant="16" id="2Pd-od-B3e"/>
                             <constraint firstItem="dcg-MX-IsS" firstAttribute="leading" secondItem="DEa-CP-K1s" secondAttribute="leading" id="BLE-Wd-ENA"/>
@@ -203,6 +204,9 @@
                             <constraint firstItem="dcg-MX-IsS" firstAttribute="top" secondItem="DEa-CP-K1s" secondAttribute="top" id="kTk-ko-oAZ"/>
                             <constraint firstItem="DEa-CP-K1s" firstAttribute="trailing" secondItem="k4q-I0-j9w" secondAttribute="trailing" constant="20" id="mA4-aA-0Mo"/>
                         </constraints>
+                        <connections>
+                            <outletCollection property="gestureRecognizers" destination="Ipp-ZD-WdG" appends="YES" id="bMO-hB-d2I"/>
+                        </connections>
                     </view>
                     <tabBarItem key="tabBarItem" title="Activities" id="J77-YL-dqK"/>
                     <toolbarItems/>
@@ -214,6 +218,11 @@
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ErB-GY-6UY" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+                <tapGestureRecognizer id="Ipp-ZD-WdG">
+                    <connections>
+                        <action selector="dismissKeyboard:" destination="eSd-i0-CC7" id="yJ9-QN-Iap"/>
+                    </connections>
+                </tapGestureRecognizer>
             </objects>
             <point key="canvasLocation" x="2024.6376811594205" y="24.776785714285712"/>
         </scene>

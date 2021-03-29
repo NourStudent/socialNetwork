@@ -81,8 +81,17 @@ class ActivitiesViewController: UIViewController, UISearchBarDelegate, UITableVi
                     }
                 }
            }
+        
+        if allPosts.isEmpty {
+          
+            self.noPostsLabel.isHidden = false
+        }
     }
     
+    @IBAction func dismissKeyboard(_ sender: UITapGestureRecognizer) {
+        
+        searchBar.resignFirstResponder()
+    }
     
     //MARK: filtring users
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
@@ -100,7 +109,7 @@ class ActivitiesViewController: UIViewController, UISearchBarDelegate, UITableVi
             }
         }
         
-       
+      
         tableView.reloadData()
     }
    

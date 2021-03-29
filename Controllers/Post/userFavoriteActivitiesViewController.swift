@@ -26,7 +26,7 @@ class userFavoriteActivitiesViewController: UIViewController ,UITableViewDelegat
     func favoriteUserActivities(cell:UITableViewCell){
         print("Inside of userFavoriteViewController now...")
         // we're going to figure out which activityName we're clicking on
-        
+       
        let indexPathTapped = tableView.indexPath(for: cell)
        let activityNameSection = activitiesTitle[indexPathTapped!.section]
        let activityName = activitiesDictionary[activityNameSection]![indexPathTapped!.row]

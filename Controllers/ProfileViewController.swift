@@ -18,11 +18,8 @@ final class ProfileViewController: UIViewController, UITableViewDelegate,UITable
     @IBOutlet weak var label: UILabel!
     
     @IBOutlet weak var tableView: UITableView!
-    
-    
-    
-    
-    var data = [ "Create New Activity","Favorite activities", "Log Out"]
+  
+    var data:[Any] = [ "Create New Activity","Favorite activities", "Log Out"]
     
     private let imageView:UIImageView = {
         let imageView = UIImageView()
@@ -36,11 +33,11 @@ final class ProfileViewController: UIViewController, UITableViewDelegate,UITable
     }()
     
     override func viewWillAppear(_ animated: Bool) {
-     
+        
         tableView.tableHeaderView = createTableHeader()
         tableView.reloadData()
     }
-  
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -57,17 +54,17 @@ final class ProfileViewController: UIViewController, UITableViewDelegate,UITable
         gesture.numberOfTapsRequired = 1
         gesture.numberOfTouchesRequired = 1
         self.imageView.addGestureRecognizer(gesture)
-    
+        
     }
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(false)
         validateAuth()
-       
+        
     }
-       
+    
     
     private func validateAuth(){
-       
+        
         if Auth.auth().currentUser == nil {
             let vc = LoginViewController()
             let nav = UINavigationController(rootViewController: vc)
@@ -76,62 +73,62 @@ final class ProfileViewController: UIViewController, UITableViewDelegate,UITable
             
         }
     }
-      
-   func createTableHeader() -> UIView? {
+    
+    func createTableHeader() -> UIView? {
         let headerView = UIImageView(frame: CGRect(x: 0,
-                                        y: 0,
-                                        width: self.view.width,
-                                        height: 300))
+                                                   y: 0,
+                                                   width: self.view.width,
+                                                   height: 300))
         
         headerView.image = #imageLiteral(resourceName: "cover3")
-    
-        imageView.frame =  CGRect(x: (headerView.width - 150)/2,
-                                                  y: 75,
-                                                  width: 150,
-                                                  height: 150)
         
-   
+        imageView.frame =  CGRect(x: (headerView.width - 150)/2,
+                                  y: 75,
+                                  width: 150,
+                                  height: 150)
+        
+        
         imageView.layer.cornerRadius = imageView.width / 2
         headerView.addSubview(imageView)
-    
-   //MARK: Retrieving user's profile image and name
         
-    DispatchQueue.main.async {
+        //MARK: Retrieving user's profile image and name
+        
+        DispatchQueue.main.async {
             ///Retrieving user's profile image
             Service.getUserProfilePhoto(imageView: self.imageView)
             Service.getUserName {
                 /// fetching the current user name from firebase
                 let defaults = UserDefaults.standard
                 self.label.text = "Welcome \(defaults.string(forKey: "name")!)"
-               
-              
-               } onError: { (error) in
+                
+                
+            } onError: { (error) in
                 self.present(Service.createAlertController(title: "Error", message: error!.localizedDescription), animated: true, completion: nil)
             }
-         
-         }
-       
-      return headerView
-    }
-  
-        
-    @objc func presentPhotoActionSheet(){
-            let actionSheet = UIAlertController(title: "Profile Picture", message: "How would you like to select a picture?", preferredStyle: .actionSheet)
-            actionSheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-            actionSheet.addAction(UIAlertAction(
-                                    title: "Take Photo",
-                                    style: .default,
-                                    handler: {[weak self]_ in
-                                        
-                                        self?.presentCamera()
-                                    }))
-            actionSheet.addAction(UIAlertAction(title: "Choose Photo", style: .default, handler: { [weak self]_ in
-                
-                                        self?.handlePlusPhoto()
-            }))
             
-            present(actionSheet, animated: true)
         }
+        
+        return headerView
+    }
+    
+    
+    @objc func presentPhotoActionSheet(){
+        let actionSheet = UIAlertController(title: "Profile Picture", message: "How would you like to select a picture?", preferredStyle: .actionSheet)
+        actionSheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        actionSheet.addAction(UIAlertAction(
+                                title: "Take Photo",
+                                style: .default,
+                                handler: {[weak self]_ in
+                                    
+                                    self?.presentCamera()
+                                }))
+        actionSheet.addAction(UIAlertAction(title: "Choose Photo", style: .default, handler: { [weak self]_ in
+            
+            self?.handlePlusPhoto()
+        }))
+        
+        present(actionSheet, animated: true)
+    }
     
     
     
@@ -139,34 +136,36 @@ final class ProfileViewController: UIViewController, UITableViewDelegate,UITable
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         
         if let editedImage = info[.editedImage] as? UIImage{
-          imageView.image = editedImage
+            imageView.image = editedImage
         }  else if  let originalImage = info[.originalImage] as? UIImage {
-          imageView.image = originalImage
+            imageView.image = originalImage
         }
-      
+        
         dismiss(animated: true, completion: nil)
     }
-
-
-
-func handlePlusPhoto(){
-  let imagePickerController = UIImagePickerController()
-   imagePickerController.delegate = self
-   imagePickerController.allowsEditing = true
-  present(imagePickerController, animated: true, completion: nil)
-}
-
-func presentCamera(){
-   let vc = UIImagePickerController()
-   vc.sourceType = .camera
-   vc.delegate = self
-   vc.allowsEditing = true
-   present(vc, animated: true)
-}
-
-
+    
+    
+    
+    func handlePlusPhoto(){
+        let imagePickerController = UIImagePickerController()
+        imagePickerController.delegate = self
+        imagePickerController.allowsEditing = true
+        present(imagePickerController, animated: true, completion: nil)
     }
-        
+    
+    func presentCamera(){
+        let vc = UIImagePickerController()
+        vc.sourceType = .camera
+        vc.delegate = self
+        vc.allowsEditing = true
+        present(vc, animated: true)
+    }
+    
+    
+    
+    
+}
+
 
 
 extension ProfileViewController  {
@@ -180,7 +179,7 @@ extension ProfileViewController  {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell" , for: indexPath)
         
-        cell.textLabel?.text = data[indexPath.row]
+        cell.textLabel?.text = data[indexPath.row] as? String
         cell.textLabel?.textAlignment = .center
         cell.selectionStyle = .gray
         
@@ -197,7 +196,7 @@ extension ProfileViewController  {
             break
         }
         
-      
+        
         return cell
     }
     
@@ -221,8 +220,8 @@ extension ProfileViewController  {
             navigationController?.pushViewController(destination, animated: false)
             
         case "Log Out":
-           
-           
+            
+            
             do {
                 try Auth.auth().signOut()
                 let vc = LoginViewController()
@@ -233,7 +232,7 @@ extension ProfileViewController  {
             }
             catch{
                 present(Service.createAlertController(title: "Error", message: error.localizedDescription), animated: true, completion: nil)
-              
+                
             }
         default:
             break
