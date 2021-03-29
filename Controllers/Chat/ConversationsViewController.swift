@@ -9,20 +9,10 @@ import UIKit
 import Firebase
 import JGProgressHUD
 
-struct Conversation {
-    let id: String
-    let name: String
-    let otherUserEmail: String
-    let latestMessage: LatestMessage
-}
 
-struct LatestMessage {
-    let date: String
-    let message: String
-    let isRead: Bool
-}
+///Controller that shows list of conversations
 
-class ConversationsViewController: UIViewController {
+final class ConversationsViewController: UIViewController {
     
     
     private let spinner = JGProgressHUD(style: .dark)
@@ -43,7 +33,7 @@ class ConversationsViewController: UIViewController {
         label.textAlignment = .center
         label.textColor = .gray
         label.font = .systemFont(ofSize:21, weight : .medium)
-        label.isHidden = true
+        label.isHidden = false
         return label
     }()
 
@@ -58,75 +48,63 @@ class ConversationsViewController: UIViewController {
         view.addSubview(tableView)
         view.addSubview(noConversationsLabel)
         
-        fetchConversations()
+        
         startListeningForConversations()
         
       }
     
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        validateAuth()
-    }
+   
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         tableView.frame = view.bounds
+        noConversationsLabel.frame = CGRect(x: 10,
+                                            y: (view.height-100)/2,
+                                            width: view.width-20,
+                                            height: 100)
     }
     
     @objc private func didTapComposeButton(){
         let vc = NewConversationViewController()
         vc.completion = { [weak self] result in
-            print("\(result)")
+            
             self?.createNewConversation(result:result)
         }
         let navVc = UINavigationController(rootViewController: vc )
         present(navVc, animated: true, completion: nil)
     }
     
-    private func createNewConversation(result: [String:String]){
+    private func createNewConversation(result: User){
         
-        guard let name = result["name"] , let email = result["email"] else{return}
-        
-        let vc = ChatViewController(with: email)
+       let vc = ChatViewController(with: result.email, id:nil)
         vc.isNewConversation = true
-        vc.title = name
+        vc.title = result.name
         vc.navigationItem.largeTitleDisplayMode = .never
         navigationController?.pushViewController(vc, animated: true)
         
     }
     
+ 
     
-    private func validateAuth(){
-       
-        if Auth.auth().currentUser == nil {
-            let vc = LoginViewController()
-            let nav = UINavigationController(rootViewController: vc)
-            nav.modalPresentationStyle = .custom
-            present(nav, animated: false)
-            
-        }
-    }
-    
-    
-    private func fetchConversations(){
-        tableView.isHidden = false
-    }
-    
+   
     private func startListeningForConversations(){
+      
+        print("starting conversation fetch...")
         
-        guard let email = UserDefaults.standard.value(forKey: "email") as? String else {
-            return
-        }
-        let safeEmail = Service.safeEmail(email: email)
         
-        Service.getAllConversations(for: safeEmail, completion: { [weak self] result in
+        Service.getAllConversations( completion: { [weak self] result in
             
             switch result {
-            
+           
             case .success(let conversations):
+                print("All Conversation: successfully get conversation models")
                 guard !conversations.isEmpty else {
+                    self?.tableView.isHidden = true
+                    self?.noConversationsLabel.isHidden = false
                     return
                 }
+                self?.noConversationsLabel.isHidden = true
+                self?.tableView.isHidden = false
                 self?.conversations = conversations
                 
                 DispatchQueue.main.async {
@@ -135,6 +113,8 @@ class ConversationsViewController: UIViewController {
                 
             case .failure(let error):
                 print("failed to get conversations: \(error.localizedDescription)" )
+                self?.tableView.isHidden = true
+                self?.noConversationsLabel.isHidden = false
             }
         })
     }
@@ -148,7 +128,7 @@ extension ConversationsViewController: UITableViewDelegate , UITableViewDataSour
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: ConversationTableViewCell.identifier , for: indexPath) as! ConversationTableViewCell
-        let model = conversations[indexPath.row] 
+        let model = conversations[indexPath.row]
         
         cell.configure(with: model)
         return cell
@@ -158,11 +138,10 @@ extension ConversationsViewController: UITableViewDelegate , UITableViewDataSour
         tableView.deselectRow(at: indexPath, animated: true)
         let model = conversations[indexPath.row]
         
-        let vc = ChatViewController(with: model.otherUserEmail)
+        let vc = ChatViewController(with: model.otherUserEmail, id: model.id)
         vc.title = model.name
         vc.navigationItem.largeTitleDisplayMode = .never
         navigationController?.pushViewController(vc, animated: true)
-        
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {

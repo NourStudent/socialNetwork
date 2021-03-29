@@ -49,8 +49,7 @@ class ConversationTableViewCell: UITableViewCell {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        NSLayoutConstraint.activate(NSLayoutConstraint.constraints(withVisualFormat: "H:|-16-[v0]-16-|", metrics: nil, views: ["v0":userImageView]))
-        NSLayoutConstraint.activate(NSLayoutConstraint.constraints(withVisualFormat: "V:|-16-[v0]-16-|", metrics: nil, views: ["v0":userImageView]))
+      
         
         userImageView.frame = CGRect(x: 10,
                                     y: 10,
@@ -74,15 +73,21 @@ class ConversationTableViewCell: UITableViewCell {
         
         self.userMessageLabel.text = model.latestMessage.message
         self.userNameLabel.text = model.name
+        let path  = "profile_Images/\(model.otherUserEmail)_profile_picture.png"
+       
         
-        let path = "\(model.otherUserEmail)_profile_picture.png"
-        
-        let storageRef = Storage.storage().reference()
-        storageRef.downloadURL { (path, error) in
-            <#code#>
-        }
-        
-        
+        Service.downloadURL(for: path, completion: { result in
+          
+            switch result {
+            case .success(let url):
+                DispatchQueue.main.async {
+                    self.userImageView.sd_setImage(with: url, completed: nil)
+                }
+            case .failure(let error):
+                print("failed to get conversation image url \(error)")
+            }
+            
+        })
         
     }
 
