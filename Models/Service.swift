@@ -23,7 +23,7 @@ class Service {
             let user = result.user
             
             uploadToDatabase(email: email, name: name,image:image,onSuccess: onSuccess)
-         
+            
             UserDefaults.standard.setValue(email, forKey: "email")
             
             print("user Created: \(user)"
@@ -39,7 +39,7 @@ class Service {
                 onError(error!)
                 return
             }
-           
+            
             onSuccess()
             let user = result.user
             UserDefaults.standard.setValue(email, forKey: "email")
@@ -129,7 +129,7 @@ class Service {
         
         
         let ref = Database.database().reference()
-       
+        
         guard let user = Auth.auth().currentUser else {return}
         guard let currentUserEmail = user.email else{return}
         let safeEmail = Service.safeEmail(email: currentUserEmail).lowercased()
@@ -138,23 +138,23 @@ class Service {
         ref.child("users").child(safeEmail).observeSingleEvent(of:.value, with: { snapshot in
             
             if !snapshot.exists(){return}
-          
+            
             if let dictionary = snapshot.value as? NSDictionary {
-          
+                
                 /// if user doesn't upload a profile photo
                 guard let profilePhoto = dictionary["profileImage"] as? String else{
                     
                     return
                 }
                 
-             
+                
                 let storageRef = Storage.storage().reference(forURL: profilePhoto)
                 storageRef.downloadURL { (url, error) in
                     do{
                         let data = try Data(contentsOf: url!)
                         let image = UIImage(data: data as Data)
-                        
                         imageView.image = image
+                        
                     } catch {
                         print(error.localizedDescription)
                         
@@ -163,10 +163,10 @@ class Service {
                 
             }
         })
-    
+        
     }
-  
-
+    
+    
     
     //MARK: ALERTE FUNCTION
     static func createAlertController(title: String, message:String) -> UIAlertController {
@@ -192,15 +192,15 @@ class Service {
         guard let user = Auth.auth().currentUser ,let currentUserEmail = user.email else {
             return
         }
-       let safeEmail = Service.safeEmail(email: currentUserEmail).lowercased()
+        let safeEmail = Service.safeEmail(email: currentUserEmail).lowercased()
         
         guard let currentUserName = UserDefaults.standard.value(forKey: "name") else {
             return
         }
         
         ref.child("users").child(safeEmail).observeSingleEvent(of:.value, with: { snapshot in
-         
-           
+            
+            
             guard var userNode = snapshot.value as? [String: Any] else {
                 completion(false)
                 print("user not found")
@@ -249,8 +249,8 @@ class Service {
                 
             ]
             
-           
-        let recipient_newConversationData : [String : Any] = [
+            
+            let recipient_newConversationData : [String : Any] = [
                 
                 "id":conversationId,
                 "name": currentUserName,
@@ -265,17 +265,17 @@ class Service {
             
             //update recipient conversation entry
             ref.child("users").child("\(otherUserEmail.lowercased())/conversations").observeSingleEvent(of: .value, with: {snapshot in
-                            if var conversations = snapshot.value as? [[String: Any]]{
-                                //append
-                                conversations.append(recipient_newConversationData)
-                                ref.child("\(otherUserEmail.lowercased())/conversations").setValue(conversations)
-            
-                            }else{
-                                //create
-                                ref.child("users").child("\(otherUserEmail.lowercased())/conversations").setValue([recipient_newConversationData])
-                            }
-            
-                        })
+                if var conversations = snapshot.value as? [[String: Any]]{
+                    //append
+                    conversations.append(recipient_newConversationData)
+                    ref.child("\(otherUserEmail.lowercased())/conversations").setValue(conversations)
+                    
+                }else{
+                    //create
+                    ref.child("users").child("\(otherUserEmail.lowercased())/conversations").setValue([recipient_newConversationData])
+                }
+                
+            })
             //update current user conversation entry
             if var conversations = userNode["conversations"] as? [[String:Any]]{
                 //conversation array exists for current user, should append
@@ -385,7 +385,7 @@ class Service {
         guard let user = Auth.auth().currentUser ,let currentUserEmail = user.email  else {
             return
         }
-       
+        
         
         let safeEmail = Service.safeEmail(email: currentUserEmail).lowercased()
         
@@ -508,7 +508,7 @@ class Service {
             let messageDate =  newMessage.sentDate
             let dateString = ChatViewController.dateFormatter.string(from: messageDate)
             
-          
+            
             
             let newMessageEntry: [String:Any] = [
                 
@@ -529,7 +529,7 @@ class Service {
                 }
                 
                 ref.child("users").child("\(safeCurrentEmail)/conversations").observeSingleEvent(of: .value, with: { (snapshot) in
-                  print(snapshot)
+                    print(snapshot)
                     guard var currentUserConversations = snapshot.value as? [[String: Any]] else{
                         completion(false)
                         return
@@ -545,61 +545,61 @@ class Service {
                         
                         if let currentId = conversationDictionary["id"] as? String , currentId == conversation {
                             conversationDictionary["latest_message"] = updateValue
-                          
+                            
                         }
                         currentUserConversations = [conversationDictionary]
                     }
                     
-                   
                     
-                        ref.child("users").child("\(safeCurrentEmail)/conversations").setValue(currentUserConversations, withCompletionBlock: { (error, _) in
-                            guard error == nil else{
+                    
+                    ref.child("users").child("\(safeCurrentEmail)/conversations").setValue(currentUserConversations, withCompletionBlock: { (error, _) in
+                        guard error == nil else{
+                            completion(false)
+                            return
+                        }
+                        
+                        //Update latest message for recipient user
+                        
+                        ref.child("users").child("\(otherUserEmail.lowercased())/conversations").observeSingleEvent(of: .value, with: { (snapshot) in
+                            
+                            guard var otherUserConversations = snapshot.value as? [[String: Any]] else{
                                 completion(false)
                                 return
                             }
                             
-                            //Update latest message for recipient user
+                            for var conversationDictionary in otherUserConversations {
+                                
+                                let updateValue:[String:Any] = [
+                                    "date": dateString,
+                                    "is_read": false,
+                                    "message": message
+                                ]
+                                
+                                if let currentId = conversationDictionary["id"] as? String , currentId == conversation {
+                                    conversationDictionary["latest_message"] = updateValue
+                                    
+                                }
+                                otherUserConversations = [conversationDictionary]
+                            }
                             
-                            ref.child("users").child("\(otherUserEmail.lowercased())/conversations").observeSingleEvent(of: .value, with: { (snapshot) in
                             
-                                guard var otherUserConversations = snapshot.value as? [[String: Any]] else{
+                            
+                            ref.child("users").child("\(otherUserEmail.lowercased())/conversations").setValue(otherUserConversations, withCompletionBlock: { (error, _) in
+                                guard error == nil else{
                                     completion(false)
                                     return
                                 }
                                 
-                                for var conversationDictionary in otherUserConversations {
-                                    
-                                    let updateValue:[String:Any] = [
-                                        "date": dateString,
-                                        "is_read": false,
-                                        "message": message
-                                    ]
-                                    
-                                    if let currentId = conversationDictionary["id"] as? String , currentId == conversation {
-                                        conversationDictionary["latest_message"] = updateValue
-                                      
-                                    }
-                                    otherUserConversations = [conversationDictionary]
-                                }
-                                
-                               
-                                
-                                ref.child("users").child("\(otherUserEmail.lowercased())/conversations").setValue(otherUserConversations, withCompletionBlock: { (error, _) in
-                                        guard error == nil else{
-                                            completion(false)
-                                            return
-                                        }
-                                        
-                                        completion(true)
-                                    })
-                                })
-                         })
+                                completion(true)
+                            })
+                        })
                     })
-                }
-         })
+                })
+            }
+        })
     }
-
-
+    
+    
     
     //MARK: to avoid this bug *** Terminating app due to uncaught exception 'InvalidPathValidation', reason: '(child:) Must be a non-empty string and not contain '.' '#' '$' '[' or ']''
     
@@ -613,7 +613,7 @@ class Service {
         
     }
     
-   
+    
     //MARK: Handling posts
     ///create new post
     
@@ -624,7 +624,7 @@ class Service {
         guard let user = Auth.auth().currentUser ,let currentUserEmail = user.email else {
             return
         }
-       let safeEmail = Service.safeEmail(email: currentUserEmail).lowercased()
+        let safeEmail = Service.safeEmail(email: currentUserEmail).lowercased()
         
         guard let currentUserName = UserDefaults.standard.value(forKey: "name") as? String else {
             return
@@ -638,20 +638,20 @@ class Service {
         let timestamp = Date().timeIntervalSince1970
         // gives date with time portion in UTC 0
         let date = Date(timeIntervalSince1970: timestamp)
-
+        
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MMM-dd-yyyy"  // change to your required format
         dateFormatter.timeZone = TimeZone.current
-
+        
         // date with time portion in your specified timezone
         let dateString = dateFormatter.string(from: date)
         print("dateString: \(dateString)")
         
-       
-        ref.child("users").child(safeEmail).observeSingleEvent(of:.value, with: { snapshot in
         
+        ref.child("users").child(safeEmail).observeSingleEvent(of:.value, with: { snapshot in
+            
             guard var userNode = snapshot.value as? [String: Any] else {
-               completion(false)
+                completion(false)
                 print("user not found")
                 return
             }
@@ -663,114 +663,114 @@ class Service {
             ]
             
             userNode["Lastpost"] = [
-                  newPostData
+                newPostData
             ]
             
             ref.child("users").child(safeEmail).setValue(userNode, withCompletionBlock: {  error,_ in
                 guard error == nil else{
                     completion(false)
-                   return
+                    return
                 }
                 self.finishCreatingPost(authorImage: currentUserPhoto,author: currentUserName ,postID:postId,activityName:activityName,startingDate:startingDate,endingDate:endingDate,teamMembers:teamMembers,location:location,
                                         completion:completion)
-                   completion(true)
+                completion(true)
                 
             })
-
+            
         })
     }
-
-
+    
+    
     static func finishCreatingPost(authorImage:String,author:String,postID:String,activityName:String,startingDate:String,endingDate:String,teamMembers:String,location:String,
-                               completion:@escaping (Bool)->Void){
-    let ref = Database.database().reference()
+                                   completion:@escaping (Bool)->Void){
+        let ref = Database.database().reference()
         
         let timestamp = Date().timeIntervalSince1970
         // gives date with time portion in UTC 0
         let date = Date(timeIntervalSince1970: timestamp)
-
+        
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MMM-dd-yyyy"  // change to your required format
         dateFormatter.timeZone = TimeZone.current
-
+        
         // date with time portion in your specified timezone
         let dateString = dateFormatter.string(from: date)
         print("dateString: \(dateString)")
         
-    let postID = "activity_\(postID)"
-    let collectionPost: [String:Any] = [
-        "id": postID,
-        "author":author,
-        "authorImage": authorImage,
-        "date": dateString,
-        "activityName": activityName,
-        "startingDate": startingDate,
-        "endingDate": endingDate,
-        "teamMembers":teamMembers,
-        "Location": location
+        let postID = "activity_\(postID)"
+        let collectionPost: [String:Any] = [
+            "id": postID,
+            "author":author,
+            "authorImage": authorImage,
+            "date": dateString,
+            "activityName": activityName,
+            "startingDate": startingDate,
+            "endingDate": endingDate,
+            "teamMembers":teamMembers,
+            "Location": location
+            
+        ]
         
-    ]
-            
-    let value : [String:Any] = collectionPost
-         
-    ref.child("allPosts").child("\(postID)").setValue(value,withCompletionBlock: { (error, _) in
-                guard error == nil else {
-                    completion(false)
-                    return
-                }
-                completion(true)
-            })
-            
-}
+        let value : [String:Any] = collectionPost
+        
+        ref.child("allPosts").child("\(postID)").setValue(value,withCompletionBlock: { (error, _) in
+            guard error == nil else {
+                completion(false)
+                return
+            }
+            completion(true)
+        })
+        
+    }
     
     
     
     static func favoriteActivities(activityName:String,completion: @escaping (Bool) -> Void) {
-
-           let ref = Database.database().reference()
-
-           guard let user = Auth.auth().currentUser ,let currentUserEmail = user.email else {
-                   return
-               }
-              let safeEmail = Service.safeEmail(email: currentUserEmail).lowercased()
-      
-
-            ref.child("users").child(safeEmail).observeSingleEvent(of:.value, with: { snapshot in
-
-                   guard var userNode = snapshot.value as? [String: Any] else {
-                      completion(false)
-                       print("user not found")
-                       return
-                   }
-
-                if var posts = userNode["favoriteActivities"] as? [String] {
-                    posts.append(activityName)
-                    userNode["favoriteActivities"] = posts
+        
+        let ref = Database.database().reference()
+        
+        guard let user = Auth.auth().currentUser ,let currentUserEmail = user.email else {
+            return
+        }
+        let safeEmail = Service.safeEmail(email: currentUserEmail).lowercased()
+        
+        
+        ref.child("users").child(safeEmail).observeSingleEvent(of:.value, with: { snapshot in
+            
+            guard var userNode = snapshot.value as? [String: Any] else {
+                completion(false)
+                print("user not found")
+                return
+            }
+            
+            if var posts = userNode["favoriteActivities"] as? [String] {
+                posts.append(activityName)
+                userNode["favoriteActivities"] = posts
+                
+                
+                //favoriteActivities array already exist
+                ref.child("users").child(safeEmail).setValue(userNode, withCompletionBlock: {  error,_ in
+                    guard error == nil else{
+                        completion(false)
+                        return
+                    }
                     
                     
-                    //favoriteActivities array already exist
-                    ref.child("users").child(safeEmail).setValue(userNode, withCompletionBlock: {  error,_ in
-                       guard error == nil else{
-                           completion(false)
-                          return
-                       }
-                     
-                        
-                    })
-                  }else{
-                    //favoriteActivities array does not exist
-                       userNode["favoriteActivities"] = [activityName]
-                   ref.child("users").child(safeEmail).setValue(userNode,withCompletionBlock: {
-                           error,_ in
-                               guard error == nil else{
-                                   completion(false)
-                                   return
-                               }
                 })
-           }
-    }
-)}
-
+            }else{
+                //favoriteActivities array does not exist
+                userNode["favoriteActivities"] = [activityName]
+                ref.child("users").child(safeEmail).setValue(userNode,withCompletionBlock: {
+                    error,_ in
+                    guard error == nil else{
+                        completion(false)
+                        return
+                    }
+                })
+            }
+        }
+        )}
+    
     
     
     static func deleteFromFavoriteActivity(activityName:String ,completion: @escaping ((Bool) -> Void)){
@@ -780,10 +780,10 @@ class Service {
         guard let user = Auth.auth().currentUser ,let currentUserEmail = user.email else {
             return
         }
-       let safeEmail = Service.safeEmail(email: currentUserEmail).lowercased()
+        let safeEmail = Service.safeEmail(email: currentUserEmail).lowercased()
         let reference =  ref.child("users").child("\(safeEmail)").child("favoriteActivities")
         
-       reference.observeSingleEvent(of: .value, with: {snapshot in
+        reference.observeSingleEvent(of: .value, with: {snapshot in
             if var favoriteActivities = snapshot.value as? [String] {
                 var postionToRemove = 0
                 for activity in favoriteActivities {
@@ -809,20 +809,20 @@ class Service {
 }
 
 
-    
 
+
+
+public enum DatabaseError: Error {
+    case failedToFetch
     
-    public enum DatabaseError: Error {
-            case failedToFetch
-            
-            public var localizedDescription: String {
-                switch self {
-                case .failedToFetch:
-                    return "Database fetching failed"
-                }
-            }
+    public var localizedDescription: String {
+        switch self {
+        case .failedToFetch:
+            return "Database fetching failed"
         }
-    
-    
-   
+    }
+}
+
+
+
 

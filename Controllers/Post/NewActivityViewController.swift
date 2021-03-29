@@ -33,11 +33,7 @@ class NewActivityViewController: UIViewController , UIPickerViewDelegate , UIPic
     let locationManager = CLLocationManager()
     let regionInMeters:Double = 10000
     var previousLocation : CLLocation?
-    
-    
-    
-    
-    
+   
     public static let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateStyle = .medium

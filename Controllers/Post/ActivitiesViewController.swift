@@ -31,14 +31,20 @@ class ActivitiesViewController: UIViewController, UISearchBarDelegate, UITableVi
         return label
     }()
     
+    
     private let spinner = JGProgressHUD(style: .dark)
     var allPosts = [Post]()
-    var searchedPosts = [Post]()
+    var searchedPosts:[Post]!
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(true)
+        searchAllPosts()
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.addSubview(noPostsLabel)
-        searchAllPosts()
+        searchedPosts = allPosts
         dismissButton.layer.cornerRadius = 10
     }
     
@@ -68,51 +74,37 @@ class ActivitiesViewController: UIViewController, UISearchBarDelegate, UITableVi
                     self.allPosts.append(post)
                    
                     DispatchQueue.main.async {
+                        self.searchedPosts = self.allPosts
                         self.tableView.reloadData()
                         self.noPostsLabel.isHidden = true
                         
                     }
-                }else{
-                   
-                    self.tableView.isHidden = true
-                    self.noPostsLabel.isHidden = false
-                    
                 }
            }
     }
     
-    //MARK: filtring users
-    func filterActivities (with term: String) {
-        
-        let searchedActivityByName = self.allPosts.filter({
-            let activityName = $0.activityName.lowercased()
-            return activityName.hasPrefix(term.lowercased())
-            
-        })
-        self.searchedPosts.append(contentsOf: searchedActivityByName)
-        
-        let searchedActivityByAuthor = self.allPosts.filter({
-            let authorName = $0.author.lowercased()
-            return authorName.hasPrefix(term.lowercased())
-        })
-       
-        self.searchedPosts.append(contentsOf: searchedActivityByAuthor)
-        self.spinner.dismiss()
-       
-    }
     
-    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        spinner.show(in: view)
-        guard let text = searchBar.text , !text.replacingOccurrences(of: " ", with: "").isEmpty else{return}
+    //MARK: filtring users
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        searchedPosts = []
         
-        searchBar.resignFirstResponder()
+        if searchText == "" {
+            searchedPosts = allPosts
+        }else{
+            
+            for post in allPosts {
+                if post.author.lowercased().contains(searchText.lowercased()) || post.activityName.lowercased().contains(searchText.lowercased()) {
+                    searchedPosts.append(post)
+                }
+                
+            }
+        }
         
-        searchedPosts.removeAll()
        
-        filterActivities(with: text)
-        print("searched post count:\(searchedPosts.count)")
-         spinner.dismiss()
+        tableView.reloadData()
     }
+   
+
     
     @IBAction func dismissViewAction(_ sender: UIButton) {
         dismiss(animated: true, completion: nil)
@@ -127,11 +119,9 @@ class ActivitiesViewController: UIViewController, UISearchBarDelegate, UITableVi
     
     
    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if searchBar.isFocused && searchBar.text != " "{
+        
             return searchedPosts.count
-        }else{
-            return allPosts.count
-        }
+        
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -141,14 +131,11 @@ class ActivitiesViewController: UIViewController, UISearchBarDelegate, UITableVi
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "postCell",for: indexPath) as! PostTableViewCell
-        if searchBar.isFocused && searchBar.text != " "{
+       
             let model = searchedPosts[indexPath.row]
             cell.configure(with: model)
-        }else{
-        let model = allPosts[indexPath.row]
-        cell.configure(with: model)
-        }
-       return cell
+        
+            return cell
         
        
     

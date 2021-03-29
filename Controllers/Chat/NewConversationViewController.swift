@@ -14,7 +14,7 @@ class NewConversationViewController: UIViewController, UISearchBarDelegate{
     public var completion: ((User)-> (Void))?
     private let spinner = JGProgressHUD(style: .dark)
     var allUsers = [User]()
-    var results = [User]()
+    var results:[User]!
     
     private let searchBar : UISearchBar = {
         let searchBar = UISearchBar()
@@ -22,16 +22,7 @@ class NewConversationViewController: UIViewController, UISearchBarDelegate{
         return searchBar
         
     }()
-    
-    private let noResultsLabel: UILabel = {
-        let label = UILabel()
-        label.isHidden = true
-        label.text = "No Results"
-        label.textAlignment = .center
-        label.textColor = .red
-        label.font = .systemFont(ofSize: 21 , weight: .medium)
-        return label
-    }()
+  
     
     private let tableView: UITableView = {
         let table = UITableView()
@@ -39,18 +30,24 @@ class NewConversationViewController: UIViewController, UISearchBarDelegate{
         return table
     }()
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(true)
+        fetchAllUsers()
+       
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        
+       
+       
         view.addSubview(tableView)
-        view.addSubview(noResultsLabel)
+       
         
         tableView.delegate = self
         tableView.dataSource = self
         searchBar.delegate = self
-        
-        fetchAllUsers()
+        results = allUsers
+       
         
         view.backgroundColor = .systemBackground
         navigationController?.navigationBar.topItem?.titleView = searchBar
@@ -63,27 +60,32 @@ class NewConversationViewController: UIViewController, UISearchBarDelegate{
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         tableView.frame = view.bounds
-        noResultsLabel.frame = CGRect(x: view.width/4, y: (view.height-200)/2, width: view.width/2, height: 200)
-        
-    }
+      }
     
     
     @objc private func dismissSelf(){
         dismiss(animated: true, completion: nil)
     }
  
-    
-    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        spinner.show(in: view)
-        guard let text = searchBar.text , !text.replacingOccurrences(of: " ", with: "").isEmpty else{return}
+
+    //MARK: Search Bar Config
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+       results = []
         
-        searchBar.resignFirstResponder()
+        if searchText == "" {
+            results = allUsers
+        }else{
+            
+            for user in allUsers {
+                if user.name.lowercased().contains(searchText.lowercased()){
+                    results.append(user)
+                }
+                
+            }
+        }
         
-        results.removeAll()
-        self.filterUsers(with: text)
+       
         tableView.reloadData()
-        print("results array count :\(results.count)")
-        
     }
      
     
@@ -102,71 +104,36 @@ class NewConversationViewController: UIViewController, UISearchBarDelegate{
                 self.allUsers.append(user)
             }
             DispatchQueue.main.async {
+                self.results = self.allUsers
                 self.tableView.reloadData()
                 self.spinner.dismiss()
             }
             
         })
     }
-    
-    
-    func updateUI(){
-        if results.isEmpty {
-            spinner.dismiss()
-            tableView.isHidden = true
-            noResultsLabel.isHidden = false
-            
-        }else{
-            tableView.isHidden = false
-            noResultsLabel.isHidden = true
-            tableView.reloadData()
-        }
-    }
-    
-    //MARK: filtring users
-    func filterUsers (with term: String) {
-        
-        let filterdUsers :[User] = self.allUsers.filter({
-            let name = $0.name.lowercased()
-            return name.hasPrefix(term.lowercased())
-        })
-        self.results = filterdUsers
-        tableView.reloadData()
-        self.spinner.dismiss()
-        updateUI()
-    }
+ 
 }
 
 extension NewConversationViewController : UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if searchBar.isFocused && searchBar.text != " "{
+       
    
             return results.count
-        }else{
-            return allUsers.count
-        }
+        
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell(style: UITableViewCell.CellStyle.subtitle, reuseIdentifier: "cell")
-        
-        if searchBar.isFocused && searchBar.text != " "{
-           
-            cell.textLabel?.text = results[indexPath.row].name
-            cell.detailTextLabel?.text = results[indexPath.row].email
-        }else{
-            cell.textLabel?.text = allUsers[indexPath.row].name
-            cell.detailTextLabel?.text = allUsers[indexPath.row].email
-        }
-        
-        
+       
+        cell.textLabel?.text = results[indexPath.row].name
+        cell.detailTextLabel?.text = results[indexPath.row].email
         return cell
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        let targetUserData = allUsers[indexPath.row]
+        let targetUserData = results[indexPath.row]
         dismiss(animated: true, completion: { [weak self] in
             self?.completion?(targetUserData)
         })
