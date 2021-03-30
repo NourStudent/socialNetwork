@@ -19,7 +19,7 @@ final class ProfileViewController: UIViewController, UITableViewDelegate,UITable
     
     @IBOutlet weak var tableView: UITableView!
   
-    var data:[Any] = [ "Create New Activity","Favorite activities", "Log Out"]
+    var data = [ "Create New Activity","Favorite activities", "Log Out"]
     
     private let imageView:UIImageView = {
         let imageView = UIImageView()

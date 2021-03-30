@@ -53,13 +53,39 @@ extension userFavoriteActivitiesViewController: UITableViewDelegate , UITableVie
             return
         }
         var activity = listOfactivities[indexPath.row]
+   
         activity.isFavorited = !activity.isFavorited
         cell.imageFavorite.image = UIImage(named: "favorited")
         
         listOfactivities.remove(at: indexPath.row)
         listOfactivities.insert(activity, at: indexPath.row)
         
-        cell.imageFavorite.image = activity.isFavorited == true ? UIImage(named: "favorited") : UIImage(named: "notFavorited")
+        if activity.isFavorited == true {
+            
+        cell.imageFavorite.image = UIImage(named: "favorited")
+            Service.favoriteActivities(activityName: activity.title, completion: { succes in
+                if succes {
+                    print("added to database suuccefully")
+                } else{
+                    print("failed to add it")
+                }
+            })
+        
+    } else{
+        
+        cell.imageFavorite.image = UIImage(named: "notFavorited")
+        Service.deleteFromFavoriteActivity(activityName: activity.title, completion: { success in
+            if success{
+                print("deleted suuccefully")
+            } else{
+                print("failed delete it")
+            }
+            
+        })
+        
+    
+    
+    }
     }
 
     

@@ -14,10 +14,7 @@ class ActivitiesViewController: UIViewController, UISearchBarDelegate, UITableVi
     public var completion: (([String:String])-> (Void))?
     
     @IBOutlet weak var searchBar: UISearchBar!
-    
     @IBOutlet weak var tableView: UITableView!
-    
-   
     @IBOutlet weak var dismissButton: UIButton!
     
     
@@ -72,14 +69,13 @@ class ActivitiesViewController: UIViewController, UISearchBarDelegate, UITableVi
                     let imageUrl = dictionary["authorImage"] as! String
                     let post = Post(Location: location, activityName: activityName, author: authorName, authorImage: imageUrl, endingDate: endDate, startingDate: startDate, teamMembers: teamMembers)
                     self.allPosts.append(post)
-                   
+                }
                     DispatchQueue.main.async {
                         self.searchedPosts = self.allPosts
                         self.tableView.reloadData()
                         self.noPostsLabel.isHidden = true
                         
                     }
-                }
            }
         
         if allPosts.isEmpty {
@@ -145,9 +141,7 @@ class ActivitiesViewController: UIViewController, UISearchBarDelegate, UITableVi
             cell.configure(with: model)
         
             return cell
-        
-       
-    
+
     }
 
 }

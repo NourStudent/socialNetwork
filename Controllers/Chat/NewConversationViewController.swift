@@ -38,11 +38,7 @@ class NewConversationViewController: UIViewController, UISearchBarDelegate{
     
     override func viewDidLoad() {
         super.viewDidLoad()
-       
-       
         view.addSubview(tableView)
-       
-        
         tableView.delegate = self
         tableView.dataSource = self
         searchBar.delegate = self
