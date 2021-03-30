@@ -234,17 +234,44 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="7e4-2a-PzY">
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="60" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="7e4-2a-PzY">
                                 <rect key="frame" x="0.0" y="44" width="414" height="818"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="userPostscell" id="Je5-yO-nGN" customClass="ActivityTableViewCell" customModule="socialNetwork" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="28" width="414" height="43.5"/>
+                                        <rect key="frame" x="0.0" y="28" width="414" height="60"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Je5-yO-nGN" id="vwF-NL-RHz">
-                                            <rect key="frame" x="0.0" y="0.0" width="414" height="43.5"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="60"/>
                                             <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="FYj-vI-kE6">
+                                                    <rect key="frame" x="30" y="10" width="334" height="40"/>
+                                                    <fontDescription key="fontDescription" name="AvenirNext-DemiBold" family="Avenir Next" pointSize="20"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="notFavorited" translatesAutoresizingMaskIntoConstraints="NO" id="zGf-kM-EMl">
+                                                    <rect key="frame" x="354" y="9" width="40" height="40"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="width" constant="40" id="Nax-Rf-KTC"/>
+                                                        <constraint firstAttribute="height" constant="40" id="Vzl-mB-3af"/>
+                                                    </constraints>
+                                                </imageView>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstAttribute="trailing" secondItem="zGf-kM-EMl" secondAttribute="trailing" constant="20" id="8w3-LM-ksr"/>
+                                                <constraint firstItem="zGf-kM-EMl" firstAttribute="centerY" secondItem="vwF-NL-RHz" secondAttribute="centerY" constant="-1" id="C3D-Sb-Puq"/>
+                                                <constraint firstItem="FYj-vI-kE6" firstAttribute="centerY" secondItem="vwF-NL-RHz" secondAttribute="centerY" id="bgZ-4e-37E"/>
+                                                <constraint firstItem="FYj-vI-kE6" firstAttribute="leading" secondItem="vwF-NL-RHz" secondAttribute="leadingMargin" constant="10" id="jlq-Ya-y9k"/>
+                                                <constraint firstItem="zGf-kM-EMl" firstAttribute="leading" secondItem="FYj-vI-kE6" secondAttribute="trailing" constant="-10" id="tlX-Mj-dxT"/>
+                                                <constraint firstItem="FYj-vI-kE6" firstAttribute="height" secondItem="zGf-kM-EMl" secondAttribute="height" id="u1Z-Oh-sLl"/>
+                                            </constraints>
                                         </tableViewCellContentView>
+                                        <connections>
+                                            <outlet property="activityLabel" destination="FYj-vI-kE6" id="vCE-Fk-9C4"/>
+                                            <outlet property="imageFavorite" destination="zGf-kM-EMl" id="5tT-M6-os1"/>
+                                        </connections>
                                     </tableViewCell>
                                 </prototypes>
                                 <connections>
@@ -268,7 +295,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="vo2-Rs-o0T" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-624" y="1636"/>
+            <point key="canvasLocation" x="-624.63768115942037" y="1635.9375"/>
         </scene>
         <!--Profile-->
         <scene sceneID="ZHP-wf-KQK">
@@ -716,6 +743,7 @@
         </scene>
     </scenes>
     <resources>
+        <image name="notFavorited" width="256" height="238.5"/>
         <image name="pin" width="512" height="512"/>
         <namedColor name="AccentColor">
             <color red="0.0" green="0.46000000000000002" blue="0.89000000000000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
